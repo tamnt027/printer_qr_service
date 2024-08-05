@@ -13,7 +13,7 @@ def get_available_printers() :
 
     simulator = os.getenv('CUPS_SIMULATOR')
 
-    if simulator is None or simulator == False:
+    if simulator is None or simulator == 'False':
 
         import cups
         conn = cups.Connection ()
@@ -32,7 +32,7 @@ def printFile(printer : PrinterModel, printer_task : PrinterTaskModel ):
 
     simulator = os.getenv('CUPS_SIMULATOR')
 
-    if simulator is None or simulator == False:
+    if simulator is None or simulator == 'False':
 
         import cups
         conn = cups.Connection ()

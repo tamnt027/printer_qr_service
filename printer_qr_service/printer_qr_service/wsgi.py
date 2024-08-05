@@ -70,7 +70,7 @@ def start_pycups_notify() :
 
     print(simulator)
 
-    if simulator is None or simulator == False:
+    if simulator is None or simulator == 'False':
         threading.Thread(target=notify_main, daemon=True).start()
 
 
