@@ -11,16 +11,10 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-import threading
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'printer_qr_service.settings')
 
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
-
-from printerapp.models import PrinterTaskModel, TaskStatusTextChoices
 
 application = get_asgi_application()
 
@@ -73,53 +67,53 @@ application = get_asgi_application()
 # import threading
 # threading.Thread(target=runWs).start()
 
-def start_pycups_notify() :
+# def start_pycups_notify() :
 
-    def notify_main():
+#     def notify_main():
         
-        import cups
-        from cups_notify import Subscriber, event
-        import time
+#         import cups
+#         from cups_notify import Subscriber, event
+#         import time
 
-        def on_event(evt):
-            print('===============New Print Task Event=================')
-            print(evt)
+#         def on_event(evt):
+#             print('===============New Print Task Event=================')
+#             print(evt)
             
-            not_completed_tasks = PrinterTaskModel.objects.filter().exclude(status=TaskStatusTextChoices.Completed).all()
+#             not_completed_tasks = PrinterTaskModel.objects.filter().exclude(status=TaskStatusTextChoices.Completed).all()
 
-            for task in not_completed_tasks :
-                rss = conn.getJobAttributes(task.task_id)
-                print(rss)
+#             for task in not_completed_tasks :
+#                 rss = conn.getJobAttributes(task.task_id)
+#                 print(rss)
             
 
-        # Create a CUPS connection
-        conn = cups.Connection()
+#         # Create a CUPS connection
+#         conn = cups.Connection()
 
-        # Create a new subscriber
-        sub = Subscriber(conn)
+#         # Create a new subscriber
+#         sub = Subscriber(conn)
 
-        # Subscribe the callback to all CUPS events
-        sub.subscribe(on_event, [event.CUPS_EVT_JOB_CREATED,
-                                event.CUPS_EVT_JOB_COMPLETED,
-                                event.CUPS_EVT_JOB_STOPPED,
-                                event.CUPS_EVT_JOB_STATE_CHANGED])
+#         # Subscribe the callback to all CUPS events
+#         sub.subscribe(on_event, [event.CUPS_EVT_JOB_CREATED,
+#                                 event.CUPS_EVT_JOB_COMPLETED,
+#                                 event.CUPS_EVT_JOB_STOPPED,
+#                                 event.CUPS_EVT_JOB_STATE_CHANGED])
 
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            pass
-        finally:
-            sub.unsubscribe_all()
-
-
-    simulator = os.getenv('CUPS_SIMULATOR')
-
-    print(simulator)
-
-    if simulator is None or simulator == False:
-        threading.Thread(target=notify_main, daemon=True).start()
+#         try:
+#             while True:
+#                 time.sleep(1)
+#         except KeyboardInterrupt:
+#             pass
+#         finally:
+#             sub.unsubscribe_all()
 
 
+#     simulator = os.getenv('CUPS_SIMULATOR')
 
-start_pycups_notify()
+#     print(simulator)
+
+#     if simulator is None or simulator == False:
+#         threading.Thread(target=notify_main, daemon=True).start()
+
+
+
+# start_pycups_notify()
