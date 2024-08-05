@@ -39,7 +39,7 @@ def start_pycups_notify() :
             print(evt)
             
             not_completed_tasks = PrinterTaskModel.objects.filter().exclude(status=TaskStatusTextChoices.Completed).all()
-
+            conn = cups.Connection()
             for task in not_completed_tasks :
                 rss = conn.getJobAttributes(task.task_id)
                 print(rss)
