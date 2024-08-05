@@ -82,7 +82,7 @@ def start_pycups_notify() :
         import time
 
         def on_event(evt):
-            print('New Print Task Event')
+            print('===============New Print Task Event=================')
             print(evt)
             
             not_completed_tasks = PrinterTaskModel.objects.filter().exclude(status=TaskStatusTextChoices.Completed).all()
@@ -114,6 +114,8 @@ def start_pycups_notify() :
 
 
     simulator = os.getenv('CUPS_SIMULATOR')
+
+    print(simulator)
 
     if simulator is None or simulator == False:
         threading.Thread(target=notify_main, daemon=True).start()
