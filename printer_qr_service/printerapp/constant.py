@@ -1,0 +1,1 @@
+PDF_FOLDER = "pdf_folder/"
