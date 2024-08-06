@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-from .models import PrinterModel, PrinterTaskModel
+from .models import PrinterModel, PrinterTaskModel, TaskStatusTextChoices
 
 from .constant import PDF_FOLDER
 
@@ -43,5 +43,7 @@ def printFile(printer : PrinterModel, printer_task : PrinterTaskModel ):
         return task_id
     else:
         import random
+        printer_task.status = TaskStatusTextChoices.Completed  # default completed in simulator mode
+        printer_task.save()
         return random.randint(1000, 9000)
 

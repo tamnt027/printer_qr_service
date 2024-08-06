@@ -10,8 +10,13 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
+import json
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'printer_qr_service.settings')
+
+import rel
+import websocket
 
 import threading
 from dotenv import load_dotenv
@@ -21,12 +26,17 @@ print(dotenv_path)
 # Load environment variables from .env file
 load_dotenv(dotenv_path)
 
-from printerapp.models import PrinterTaskModel, TaskStatusTextChoices
+from printerapp.models import PrinterTaskModel, TaskStatusTextChoices, PrinterModel
+from printerapp.serializers import PrinterSerializer
 
 application = get_wsgi_application()
 
 
 from uuid import UUID
+
+WS_ACCEPT_CONNECTION = 'WS_ACCEPT_CONNECTION'
+WS_PRINTER_ONLINE = 'WS_PRINTER_ONLINE'
+WS_PRINT_DATA = 'WS_PRINT_DATA'
 
 def get_valid_uuid(uuid_to_test, version=4):
     try:
@@ -122,5 +132,57 @@ def start_pycups_notify() :
         threading.Thread(target=notify_main, daemon=True).start()
 
 
+def start_websocket_to_master():
+    def handle_ws_accept_connection(ws :  websocket.WebSocketApp):
+        # send WS_PRINTER_ONLINE to master
+
+        selected_printer = PrinterModel.objects.filter(selected=True).first()
+
+        if selected_printer is None:
+            print(f"No printer selected to send to master")
+
+
+        printer_online_obj = {
+            'type' : WS_PRINTER_ONLINE,
+            'payload': PrinterSerializer(selected_printer).data
+        }
+
+        ws.send_text(json.dumps(printer_online_obj))
+
+    def on_message(ws : websocket.WebSocketApp, message : str):
+        received_obj = json.loads(message)
+        msg_type = received_obj['type']
+
+        if msg_type == WS_ACCEPT_CONNECTION:
+            handle_ws_accept_connection(ws)
+
+
+        pass
+
+    def on_error(ws : websocket.WebSocketApp, error):
+        print(f"Websocket connection has error {str(error)}")
+
+    def on_close(ws : websocket.WebSocketApp, close_status_code, close_msg):
+        print(f"Closed connected to {ws.url} with code {close_status_code} and message {close_msg}")
+
+    def on_open(ws : websocket.WebSocketApp):
+        print(f"Opened connection to {ws.url}")
+
+    ws_address = os.getenv('MASTER_WS_ADDRESS')
+    if ws_address is None or ws_address == "":
+        print("Warning : Websocket address not set ")
+        return
+    
+    ws = websocket.WebSocketApp(ws_address, on_open=on_open,
+                              on_message=on_message,
+                              on_error=on_error,
+                              on_close=on_close)
+    ws.run_forever(dispatcher=rel, reconnect=10)
+    rel.signal(2, rel.abort)  # Keyboard Interrupt
+    rel.dispatch()
+    
+
 
 start_pycups_notify()
+
+start_websocket_to_master()

@@ -11,9 +11,11 @@ pypng==0.20220715.0
 python-dotenv==1.0.1
 qrcode==7.4.2
 referencing==0.35.1
+rel==0.4.9.19
 reportlab==4.2.2
 reportlab-qrcode==0.1.6
 rpds-py==0.19.1
 sqlparse==0.5.1
 typing_extensions==4.12.2
 tzdata==2024.1
+websocket-client==1.8.0
