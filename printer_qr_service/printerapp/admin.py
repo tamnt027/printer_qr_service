@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import  PrinterModel
+from .models import  PrinterModel, PrinterTaskModel
 
 from .cups import get_available_printers
 # Register your models here.
@@ -33,3 +33,4 @@ class PrinterAdmin(admin.ModelAdmin):
 
 
 admin.site.register(PrinterModel, PrinterAdmin)
+admin.site.register(PrinterTaskModel)
