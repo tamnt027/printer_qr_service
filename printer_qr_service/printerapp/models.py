@@ -5,10 +5,10 @@ import uuid
 
 class TaskStatusTextChoices(models.TextChoices):
     Initial = "Initial"
+    Created= "Created"
     Completed = 'Completed'
-    Pending = "Pending"
-    Cancel = "Cancel"
-    Error = "Error"
+    Progress = "Progress"
+    Stopped = "Stopped"
 
 
 class PrinterModel(models.Model):

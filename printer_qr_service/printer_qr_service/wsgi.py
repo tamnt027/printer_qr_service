@@ -26,6 +26,16 @@ from printerapp.models import PrinterTaskModel, TaskStatusTextChoices
 application = get_wsgi_application()
 
 
+from uuid import UUID
+
+def get_valid_uuid(uuid_to_test, version=4):
+    try:
+        uuid_obj = UUID(uuid_to_test, version=version)
+        return uuid_obj
+    except ValueError:
+        return None
+
+
 def start_pycups_notify() :
 
     def notify_main():
@@ -37,16 +47,50 @@ def start_pycups_notify() :
         def on_event(evt):
             print('===============New Print Task Event=================')
             print(evt)
-            print(evt.description)
+            print(evt.description)  # Find created,  started, completed.
             print(evt.guid)
-            print(evt.title)
-            
-            # not_completed_tasks = PrinterTaskModel.objects.filter().exclude(status=TaskStatusTextChoices.Completed).all()
-            # conn = cups.Connection()
-            # for task in not_completed_tasks :
-            #     rss = conn.getJobAttributes(task.task_id)
-            #     print(rss)
-            
+            print(evt.title)  # process to identify task title between ()
+            s_index = evt.title.find(' (')
+            f_index = evt.title.find(') ', start=max(0, s_index))
+
+            if s_index > -1 and s_index < f_index:  #find valid position
+                task_title = evt.title[s_index + 2 : f_index]
+
+                title_uuid = get_valid_uuid(task_title)
+
+                if title_uuid is None : 
+                    print(f"Task title '{title_uuid}' is not an uuid")
+                    return
+                
+                printer_task = PrinterTaskModel.objects.filter(uuid=title_uuid).first()
+
+                if printer_task is None: 
+                    print(f"Not found printer task with title '{title_uuid}'")
+                    return
+                    
+                created = evt.description.find("created") != -1
+                
+                if created:
+                    printer_task.status = TaskStatusTextChoices.Created
+                    printer_task.save()
+
+                started = evt.description.find("started") != -1
+
+                if started:
+                    printer_task.status = TaskStatusTextChoices.Progress
+                    printer_task.save()
+
+                stopped = evt.description.find("stopped") != -1
+                if stopped:
+                    printer_task.status = TaskStatusTextChoices.Stopped
+                    printer_task.save()
+
+                completed = evt.description.find("completed") != -1
+
+                if completed:
+                    printer_task.status = TaskStatusTextChoices.Completed
+                    printer_task.save()
+
 
         # Create a CUPS connection
         conn = cups.Connection()
@@ -58,7 +102,7 @@ def start_pycups_notify() :
         sub.subscribe(on_event, [event.CUPS_EVT_JOB_CREATED,
                                 event.CUPS_EVT_JOB_COMPLETED,
                                 event.CUPS_EVT_JOB_STOPPED,
-                                event.CUPS_EVT_JOB_STATE_CHANGED])
+                                event.CUPS_EVT_JOB_PROGRESS])
 
         try:
             while True:
