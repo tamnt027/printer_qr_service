@@ -51,7 +51,7 @@ def start_pycups_notify() :
             print(evt.guid)
             print(evt.title)  # process to identify task title between ()
             s_index = evt.title.find(' (')
-            f_index = evt.title.find(') ', start=max(0, s_index))
+            f_index = evt.title.find(') ', max(0, s_index))
 
             if s_index > -1 and s_index < f_index:  #find valid position
                 task_title = evt.title[s_index + 2 : f_index]
