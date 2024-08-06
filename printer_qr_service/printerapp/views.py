@@ -73,6 +73,7 @@ class PrintRequestView(views.APIView):
             pdf_composer.set_printer_data(printer_data=printer_data)
             pdf_composer.save()
 
+            printer_task.used_rows = pdf_composer.get_used_page()
             printer_task.task_id = printFile(printer=printer, printer_task=printer_task)
 
             printer_task.save()

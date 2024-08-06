@@ -76,6 +76,9 @@ class PDFComposer:
                 if label_counter % self._num_labels_one_line == 0 and label_counter >= self._num_labels_one_line:
                     self._pdf.showPage()
 
+    def get_used_page(self):
+        return self._pdf.getPageNumber()
+
 
     def save(self):
         self._pdf.save()
