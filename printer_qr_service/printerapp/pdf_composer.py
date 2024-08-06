@@ -77,7 +77,7 @@ class PDFComposer:
                     self._pdf.showPage()
 
     def get_used_page(self):
-        return self._pdf.getPageNumber()
+        return self._pdf.getPageNumber() - 1
 
 
     def save(self):
