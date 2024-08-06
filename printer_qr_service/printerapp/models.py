@@ -42,5 +42,5 @@ class PrinterTaskModel(models.Model):
 
 
     def __str__(self) -> str:
-        return self.name
+        return f"{str(self.uuid)} - {self.status}" 
 
