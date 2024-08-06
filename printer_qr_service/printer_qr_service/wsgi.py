@@ -102,7 +102,8 @@ def start_pycups_notify() :
         sub.subscribe(on_event, [event.CUPS_EVT_JOB_CREATED,
                                 event.CUPS_EVT_JOB_COMPLETED,
                                 event.CUPS_EVT_JOB_STOPPED,
-                                event.CUPS_EVT_JOB_PROGRESS])
+                                event.CUPS_EVT_JOB_STATE_CHANGED
+                                ])
 
         try:
             while True:
