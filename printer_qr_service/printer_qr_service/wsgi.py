@@ -150,6 +150,7 @@ def start_websocket_to_master():
         ws.send_text(json.dumps(printer_online_obj))
 
     def on_message(ws : websocket.WebSocketApp, message : str):
+        print(f"On message {message}")
         received_obj = json.loads(message)
         msg_type = received_obj['type']
 
@@ -186,8 +187,6 @@ def start_websocket_to_master():
                 print(f"Websocket error {str(e)}")
             print(f"Reconnect after 10 seconds")
             time.sleep(10)
-
-
     
     threading.Thread(target=websocket_main, daemon=True).start()
     
