@@ -26,10 +26,11 @@ print(dotenv_path)
 # Load environment variables from .env file
 load_dotenv(dotenv_path)
 
+application = get_wsgi_application()
+
 from printerapp.models import PrinterTaskModel, TaskStatusTextChoices, PrinterModel
 from printerapp.serializers import PrinterSerializer
 
-application = get_wsgi_application()
 
 from ..printerapp.pdf_composer import PDFComposer
 from ..printerapp.cups import printFile
