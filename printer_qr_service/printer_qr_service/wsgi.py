@@ -32,9 +32,9 @@ from printerapp.models import PrinterTaskModel, TaskStatusTextChoices, PrinterMo
 from printerapp.serializers import PrinterSerializer
 
 
-from ..printerapp.pdf_composer import PDFComposer
-from ..printerapp.cups import printFile
-from ..printerapp.constant import PDF_FOLDER
+from printerapp.pdf_composer import PDFComposer
+from printerapp.cups import printFile
+from printerapp.constant import PDF_FOLDER
 from uuid import UUID
 
 WS_ACCEPT_CONNECTION = 'WS_ACCEPT_CONNECTION'
