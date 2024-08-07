@@ -11,7 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 import json
-
+import time
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'printer_qr_service.settings')
 
@@ -173,11 +173,25 @@ def start_websocket_to_master():
         print("Warning : Websocket address not set ")
         return
     
-    ws = websocket.WebSocketApp(ws_address, on_open=on_open,
-                              on_message=on_message,
-                              on_error=on_error,
-                              on_close=on_close)
-    ws.run_forever( reconnect=10)
+    def websocket_main():
+        while True:
+            try:
+                ws = websocket.WebSocketApp(ws_address, on_open=on_open,
+                                    on_message=on_message,
+                                    on_error=on_error,
+                                    on_close=on_close)
+                ws.run_forever( reconnect=10)
+                print("After run_forever")
+            except Exception as e:
+                print(f"Websocket error {str(e)}")
+            print(f"Reconnect after 10 seconds")
+            time.sleep(10)
+
+
+    
+    threading.Thread(target=websocket_main, daemon=True).start()
+    
+
 
 
 
