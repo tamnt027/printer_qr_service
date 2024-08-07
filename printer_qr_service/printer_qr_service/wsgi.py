@@ -31,7 +31,9 @@ from printerapp.serializers import PrinterSerializer
 
 application = get_wsgi_application()
 
-
+from ..printerapp.pdf_composer import PDFComposer
+from ..printerapp.cups import printFile
+from ..printerapp.constant import PDF_FOLDER
 from uuid import UUID
 
 WS_ACCEPT_CONNECTION = 'WS_ACCEPT_CONNECTION'
@@ -149,6 +151,28 @@ def start_websocket_to_master():
 
         ws.send_text(json.dumps(printer_online_obj))
 
+    def handle_ws_print(ws :  websocket.WebSocketApp, received_obj):
+        printer_data = received_obj['payload']
+        printer_name = received_obj['printer_name']
+
+        printer_task : PrinterTaskModel
+        printer_task = PrinterTaskModel()
+
+        file_name = str(printer_task.uuid) + ".pdf"
+
+        printer_task.file_name = file_name
+    
+
+        pdf_composer = PDFComposer(filename=f"{PDF_FOLDER}{file_name}")
+        pdf_composer.set_printer_data(printer_data=printer_data)
+        pdf_composer.save()
+
+        printer_task.used_rows = pdf_composer.get_used_page()
+        printer_task.task_id = printFile(printer=printer_name, printer_task=printer_task)
+
+        printer_task.save()
+
+
     def on_message(ws : websocket.WebSocketApp, message : str):
         print(f"On message {message}")
         received_obj = json.loads(message)
@@ -156,6 +180,9 @@ def start_websocket_to_master():
 
         if msg_type == WS_ACCEPT_CONNECTION:
             handle_ws_accept_connection(ws)
+        elif msg_type == WS_PRINT_DATA:
+            handle_ws_print(ws, received_obj)
+
 
 
         pass
