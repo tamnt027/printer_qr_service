@@ -177,10 +177,8 @@ def start_websocket_to_master():
                               on_message=on_message,
                               on_error=on_error,
                               on_close=on_close)
-    ws.run_forever(dispatcher=rel, reconnect=10)
-    rel.signal(2, rel.abort)  # Keyboard Interrupt
-    rel.dispatch()
-    
+    ws.run_forever( reconnect=10)
+
 
 
 start_pycups_notify()
