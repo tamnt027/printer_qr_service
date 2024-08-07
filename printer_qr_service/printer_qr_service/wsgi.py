@@ -186,3 +186,5 @@ def start_websocket_to_master():
 start_pycups_notify()
 
 start_websocket_to_master()
+
+print("Done startup script")
