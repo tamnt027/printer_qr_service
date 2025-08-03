@@ -85,6 +85,7 @@ class PrintRequestView(views.APIView):
             }, status=HTTP_200_OK)
         
         except ValidationError as validation_error:
+            print(validation_error)
             return Response("Printer Data's Schema is not valid", status=HTTP_400_BAD_REQUEST)
         
         except Exception as e:
